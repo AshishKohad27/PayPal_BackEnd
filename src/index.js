@@ -11,6 +11,7 @@ const PORT = process.env.PORT;
 
 //4. Connect
 const connect = require("./Config/db");
+const taskRoute = require("./Routes/task.route");
 
 //5. Create App
 const app = express();
@@ -19,6 +20,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use("/auth", authRoutes);
+app.use("/task", taskRoute);
 
 //7. Basic Route
 app.get("/", (req, res) => {

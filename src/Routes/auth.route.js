@@ -125,6 +125,20 @@ authRoutes.post("/verify", async (req, res) => {
   }
 });
 
+//3.4 get all users
+authRoutes.get("/", async (req, res) => {
+
+  try {
+    let data = await authModel.find({}, { password: 0 })
+    return res.status(200).send({
+      message: "All Users",
+      data
+    })
+  } catch (e) {
+    console.log("e:", e.message);
+    return res.status(403).send({ message: "Access Token Expired!" });
+  }
+})
 
 //4. Exports
 module.exports = authRoutes;
