@@ -2,10 +2,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
-const { userSignUp } = require("../Controller/auth.controller");
 const authModel = require("../Model/auth.model");
-const blacklistModel = require("../Model/blacklist.model");
-const { middleWareAuth } = require("../Middleware/MiddleWareAuth");
 
 //2. Create
 const authRoutes = express.Router();
@@ -15,7 +12,7 @@ const authRoutes = express.Router();
 //3.1 Signup
 authRoutes.post("/signup", async (req, res) => {
   //1. Getting data from body
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
 
   //2. making hashed password
   const hash = await argon2.hash(password);
@@ -37,6 +34,7 @@ authRoutes.post("/signup", async (req, res) => {
       //6. create user if he/she not exist with hashed password
       let createUser = new authModel({
         email,
+        name,
         password: hash,
       });
       await createUser.save();
@@ -80,16 +78,16 @@ authRoutes.post("/login", async (req, res) => {
     if (await argon2.verify(userExistOrNot.password, password)) {
       //3. Creating Token
       const access_token = jwt.sign(
-        { _id: userExistOrNot._id, email: userExistOrNot.email },
-        "POCOCARE_27",
-        { expiresIn: "3min" }
+        { _id: userExistOrNot._id, email: userExistOrNot.email, name: userExistOrNot.name },
+        "PAYPAL_27",
+        { expiresIn: "4days" }
       );
 
       //4. Create Refresh Token
       const refresh_token = jwt.sign(
         { _id: userExistOrNot._id },
-        "POCOCARE_27_REFRESH",
-        { expiresIn: "5min" }
+        "PAYPAL_27_REFRESH",
+        { expiresIn: "7days" }
       );
 
       return res
@@ -109,89 +107,24 @@ authRoutes.post("/login", async (req, res) => {
   }
 });
 
-//3.3 Refresh Token
-authRoutes.post("/refresh", async (req, res) => {
-  //1. Taking token from headers
-  const refreshToken = req.headers["authorization_refresh"];
-  console.log("refreshToken from Refresh:", refreshToken);
 
-  //2. if token not present in header
-  if (!refreshToken) {
-    return res.status(401).send("Unauthorized User");
-  }
-
-  try {
-    //3. refresh token first verify if it's not expired then we create new token
-    const verification = jwt.verify(refreshToken, "POCOCARE_27_REFRESH");
-    if (verification) {
-      const auth = await authModel.findById({ _id: verification._id });
-      // console.log("auth:", auth);
-
-      //4. creation of new token with user id and email in token
-      const newToken = jwt.sign(
-        { _id: auth._id, email: auth.email },
-        "POCOCARE_27",
-        { expiresIn: "3min" }
-      );
-      return res.send({ access_token: newToken });
-    }
-  } catch (e) {
-    return res.status(401).send({
-      message: "Refresh Token Expired!",
-      desc: e.message,
-    });
-  }
-});
-
-authRoutes.post("/logout", async (req, res) => {
-  const access_token = req.headers["authorization_access"];
-  const refresh_token = req.headers["authorization_refresh"];
-  // console.log('token:', token)
-  const tokenPushAccess = new blacklistModel({
-    blackListItem: access_token,
-  });
-  await tokenPushAccess.save();
-  const tokenPushRefresh = new blacklistModel({
-    blackListItem: refresh_token,
-  });
-  await tokenPushRefresh.save();
-  return res.send({ message: "user logged out successfully" });
-});
-
+//3.3 Getting data from token
 authRoutes.post("/verify", async (req, res) => {
   const { token } = req.body;
   if (token === undefined) {
     return res.send("Unauthorized");
   }
   try {
- const verification = jwt.verify(token, "POCOCARE_27");   
+    const verification = jwt.verify(token, "PAYPAL_27");
     if (verification) {
       return res.status(200).send(verification);
     }
   } catch (e) {
     console.log("e:", e.message);
-    if (e.message === "jwt expired") {
-      const tokenPush = new blacklistModel({
-        blackListItem: token,
-      });
-      await tokenPush.save();
-    }
     return res.status(403).send({ message: "Access Token Expired!" });
   }
 });
 
-//checking for other pages
-authRoutes.get("/page", middleWareAuth, async (req, res) => {
-  // const access_token = req.headers['authorization_access'];
-  // const tokenInBlackList = await blacklistModel.find({ blackListItem: access_token })
-  // if (tokenInBlackList.length !== 0) {
-  //     return res.status(401).send({
-  //         message: "Token is Invalid"
-  //     })
-  // }
-  res.status(201).send({ message: "Valid Page!" });
-});
-//checking for other pages
 
 //4. Exports
 module.exports = authRoutes;
