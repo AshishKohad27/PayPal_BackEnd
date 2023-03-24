@@ -1,22 +1,30 @@
 const { Schema, model } = require("mongoose");
 
 const taskSchema = new Schema({
-    name: {
+    assignedBy: {
         type: String,
         require: true,
     },
-    startDate: {
+    assignedTo: {
         type: String,
         require: true,
     },
-    endDate: {
+    description: {
         type: String,
         require: true,
     },
-    sprintTasks: {
-        type: Array,
+    status: {
+        type: String,
         require: true,
     },
+    title: {
+        type: String,
+        require: true,
+    },
+    sprintId: {
+        type: String,
+        require: true,
+    }
 });
 
 const taskModel = model("task", taskSchema);

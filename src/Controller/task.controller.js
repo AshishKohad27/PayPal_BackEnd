@@ -1,13 +1,14 @@
 const taskModel = require("../Model/task.model");
 
-const getSprint = async () => {
+
+const getTask = async () => {
     try {
         const data = await taskModel.find({});
 
         return {
             flag: true,
             data,
-            message: "Sprint Get Successfully",
+            message: "Task Get Successfully",
             desc: "",
         };
     } catch (e) {
@@ -20,9 +21,10 @@ const getSprint = async () => {
     }
 };
 
-const addSprint = async ({ name, startDate, endDate, sprintTasks }) => {
+const addTask = async ({ ...payload }) => {
+    console.log('payload:', payload)
     try {
-        const createData = new taskModel({ name, startDate, endDate, sprintTasks });
+        const createData = new taskModel(payload);
         await createData.save();
 
         const data = await taskModel.find({});
@@ -30,7 +32,7 @@ const addSprint = async ({ name, startDate, endDate, sprintTasks }) => {
         return {
             flag: true,
             data,
-            message: "Sprint added Successfully",
+            message: "Task added Successfully",
             desc: "",
         };
     } catch (e) {
@@ -43,8 +45,8 @@ const addSprint = async ({ name, startDate, endDate, sprintTasks }) => {
     }
 };
 
-const deleteSprint = async ({ id }) => {
-    console.log('id:', id)
+const deleteTask = async ({ id }) => {
+    // console.log('id:', id)
     try {
         await taskModel.findByIdAndDelete({ _id: id });
         const data = await taskModel.find({});
@@ -52,7 +54,7 @@ const deleteSprint = async ({ id }) => {
         return {
             flag: true,
             data,
-            message: "Sprint Delete Successfully",
+            message: "Task Delete Successfully",
             desc: "",
         };
     } catch (e) {
@@ -65,4 +67,44 @@ const deleteSprint = async ({ id }) => {
     }
 };
 
-module.exports = { addSprint, getSprint, deleteSprint };
+const updateTask = async ({ id, ...payload }) => {
+    try {
+        await taskModel.findByIdAndUpdate({ _id: id }, payload)
+        const data = await taskModel.find({});
+
+        return {
+            flag: true,
+            data,
+            message: "Task Update Successfully",
+            desc: "",
+        };
+    } catch (e) {
+        return {
+            flag: false,
+            message: "Error!",
+            data: [],
+            desc: e.message,
+        };
+    }
+}
+
+const filterTaskBySprintId = async ({ sprintId }) => {
+    try {
+        const data = await taskModel.find({ sprintId })
+        return {
+            flag: true,
+            data,
+            message: "Task Filter Successfully",
+            desc: "",
+        };
+    } catch (e) {
+        return {
+            flag: false,
+            message: "Error!",
+            data: [],
+            desc: e.message,
+        };
+    }
+}
+
+module.exports = { addTask, getTask, deleteTask, updateTask, filterTaskBySprintId };

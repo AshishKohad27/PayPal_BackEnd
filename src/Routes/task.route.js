@@ -1,9 +1,9 @@
 const express = require("express");
-const { addSprint, getSprint, deleteSprint } = require("../Controller/task.controller");
+const { getTask, addTask, deleteTask, updateTask, filterTaskBySprintId } = require("../Controller/task.controller");
 const taskRoute = express.Router();
 
 taskRoute.get("/", async (req, res) => {
-    const { flag, data, message, desc } = await getSprint();
+    const { flag, data, message, desc } = await getTask();
     if (flag) {
         return res.status(201).send({ message, desc, data })
     } else {
@@ -12,8 +12,8 @@ taskRoute.get("/", async (req, res) => {
 })
 
 taskRoute.post("/", async (req, res) => {
-    const { name, startDate, endDate, sprintTasks } = req.body
-    const { flag, data, message, desc } = await addSprint({ name, startDate, endDate, sprintTasks });
+
+    const { flag, data, message, desc } = await addTask({ ...req.body });
     if (flag) {
         return res.status(201).send({ message, desc, data })
     } else {
@@ -23,7 +23,7 @@ taskRoute.post("/", async (req, res) => {
 
 taskRoute.delete("/:id", async (req, res) => {
     const id = req.params.id;
-    const { flag, data, message, desc } = await deleteSprint({ id });
+    const { flag, data, message, desc } = await deleteTask({ id });
     if (flag) {
         return res.status(201).send({ message, desc, data })
     } else {
@@ -33,8 +33,18 @@ taskRoute.delete("/:id", async (req, res) => {
 
 taskRoute.patch("/:id", async (req, res) => {
     const id = req.params.id;
-    const { } = req.body
-    const { flag, data, message, desc } = await updateSprint({ id });
+    const { flag, data, message, desc } = await updateTask({ id, ...req.body });
+    if (flag) {
+        return res.status(201).send({ message, desc, data })
+    } else {
+        return res.status(401).send({ message, desc, data })
+    }
+})
+
+taskRoute.get("/filter", async (req, res) => {
+    const { sprintId } = req.query;
+    console.log('sprintId:', sprintId)
+    const { flag, data, message, desc } = await filterTaskBySprintId({ sprintId });
     if (flag) {
         return res.status(201).send({ message, desc, data })
     } else {
