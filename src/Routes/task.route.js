@@ -1,5 +1,5 @@
 const express = require("express");
-const { getTask, addTask, deleteTask, updateTask, filterTaskBySprintId } = require("../Controller/task.controller");
+const { getTask, addTask, deleteTask, updateTask, filterTaskBySprintId, userTask } = require("../Controller/task.controller");
 const taskRoute = express.Router();
 
 taskRoute.get("/", async (req, res) => {
@@ -45,6 +45,16 @@ taskRoute.get("/filter", async (req, res) => {
     const { sprintId } = req.query;
     console.log('sprintId:', sprintId)
     const { flag, data, message, desc } = await filterTaskBySprintId({ sprintId });
+    if (flag) {
+        return res.status(201).send({ message, desc, data })
+    } else {
+        return res.status(401).send({ message, desc, data })
+    }
+})
+
+taskRoute.post("/individual", async (req, res) => {
+
+    const { flag, data, message, desc } = await userTask({ ...req.body });
     if (flag) {
         return res.status(201).send({ message, desc, data })
     } else {

@@ -68,10 +68,10 @@ const deleteTask = async ({ id }) => {
 };
 
 const updateTask = async ({ id, ...payload }) => {
+    console.log('id, ...payload from update:', id, payload)
     try {
         await taskModel.findByIdAndUpdate({ _id: id }, payload)
         const data = await taskModel.find({});
-
         return {
             flag: true,
             data,
@@ -89,11 +89,18 @@ const updateTask = async ({ id, ...payload }) => {
 }
 
 const filterTaskBySprintId = async ({ sprintId }) => {
+    console.log('sprintId :', sprintId)
     try {
-        const data = await taskModel.find({ sprintId })
+        const todo = await taskModel.find({ sprintId, status: "todo" });
+        const progress = await taskModel.find({ sprintId, status: "progress" });
+        const done = await taskModel.find({ sprintId, status: "done" });
         return {
             flag: true,
-            data,
+            data: {
+                todo,
+                progress,
+                done
+            },
             message: "Task Filter Successfully",
             desc: "",
         };
@@ -107,4 +114,24 @@ const filterTaskBySprintId = async ({ sprintId }) => {
     }
 }
 
-module.exports = { addTask, getTask, deleteTask, updateTask, filterTaskBySprintId };
+const userTask = async ({ userName }) => {
+
+    try {
+        const data = await taskModel.aggregate([{ $match: { "assignedTo": userName } }]);
+
+        return {
+            flag: true,
+            data,
+            message: "Individual Task Get Successfully",
+            desc: "",
+        };
+    } catch (e) {
+        return {
+            flag: false,
+            message: "Error!",
+            data: [],
+            desc: e.message,
+        };
+    }
+}
+module.exports = { addTask, getTask, deleteTask, updateTask, filterTaskBySprintId, userTask };
