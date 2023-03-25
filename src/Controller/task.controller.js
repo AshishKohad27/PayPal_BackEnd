@@ -117,7 +117,7 @@ const filterTaskBySprintId = async ({ sprintId }) => {
 const userTask = async ({ userName }) => {
 
     try {
-        const data = await taskModel.aggregate([{ $match: { "assignedTo": userName } }]);
+        const data = await taskModel.find({ "assignedTo": userName }).populate({ "path": "sprintId" });
 
         return {
             flag: true,

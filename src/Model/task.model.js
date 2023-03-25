@@ -1,6 +1,6 @@
-const { Schema, model } = require("mongoose");
+const mongoose = require("mongoose");
 
-const taskSchema = new Schema({
+const taskSchema = new mongoose.Schema({
     assignedBy: {
         type: String,
         require: true,
@@ -22,11 +22,13 @@ const taskSchema = new Schema({
         require: true,
     },
     sprintId: {
-        type: String,
-        require: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "sprint",
+        required: true,
     }
+
 });
 
-const taskModel = model("task", taskSchema);
+const taskModel = mongoose.model("task", taskSchema);
 
 module.exports = taskModel;
