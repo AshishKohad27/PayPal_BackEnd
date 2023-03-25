@@ -1,4 +1,5 @@
 const sprintModel = require("../Model/sprint.model");
+const taskModel = require("../Model/task.model");
 
 const getSprint = async () => {
     try {
@@ -47,8 +48,8 @@ const deleteSprint = async ({ id }) => {
     // console.log('id:', id)
     try {
         await sprintModel.findByIdAndDelete({ _id: id });
+        await taskModel.deleteMany({ sprintId: id });
         const data = await sprintModel.find({});
-
         return {
             flag: true,
             data,
