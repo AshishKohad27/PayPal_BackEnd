@@ -190,7 +190,7 @@ http://localhost:7878/task/:taskId
 ### - By this url user can Delete Data
 
 ```javascript
-Method:"DELETE
+Method:"DELETE"
 http://localhost:7878/sprint/:taskId
 ```
 
