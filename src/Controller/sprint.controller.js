@@ -48,7 +48,8 @@ const deleteSprint = async ({ id }) => {
     // console.log('id:', id)
     try {
         await sprintModel.findByIdAndDelete({ _id: id });
-        await taskModel.deleteMany({ sprintId: id });
+        await taskModel.deleteMany({ "sprintId": id });
+
         const data = await sprintModel.find({});
         return {
             flag: true,

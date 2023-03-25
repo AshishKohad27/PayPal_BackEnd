@@ -89,11 +89,11 @@ const updateTask = async ({ id, ...payload }) => {
 }
 
 const filterTaskBySprintId = async ({ sprintId }) => {
-    console.log('sprintId :', sprintId)
+    // console.log('sprintId :', sprintId)
     try {
-        const todo = await taskModel.aggregate([{ $match: { sprintId, status: "todo" } }]);
-        const progress = await taskModel.aggregate([{ $match: { sprintId, status: "progress" } }]);
-        const done = await taskModel.aggregate([{ $match: { sprintId, status: "done" } }]);
+        const todo = await taskModel.find({ sprintId, status: "todo" });
+        const progress = await taskModel.find({ sprintId, status: "progress" });
+        const done = await taskModel.find({ sprintId, status: "done" });
         return {
             flag: true,
             data: {
@@ -117,7 +117,7 @@ const filterTaskBySprintId = async ({ sprintId }) => {
 const userTask = async ({ userName }) => {
 
     try {
-        const data = await taskModel.find({ "assignedTo": userName }).populate({ "path": "sprintId" });
+        const data = await taskModel.find({ "assignedTo": userName })
 
         return {
             flag: true,

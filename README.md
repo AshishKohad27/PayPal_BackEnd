@@ -2,7 +2,9 @@
 
 Project Links
 <br/>
-Frontend:- https://pay-pal-front-end.vercel.app/login
+Frontend Deploy:- https://pay-pal-front-end.vercel.app/login
+<br/>
+Frontend Git:- https://github.com/AshishKohad27/PayPal_FrontEnd
 <br/>
 Backend :- https://chocolate-abalone-gear.cyclic.app/
 
